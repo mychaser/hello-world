@@ -2863,6 +2863,7 @@ Huawei LiteOS的软件定时器提供二类定时器机制：
 Huawei LiteOS系统中的软件定时器模块为用户提供下面几种功能，下面具体的API详见软件定时器对外接口手册。
 
 表1  
+
 <table>
 	<tr>
     <td width = "25%">功能分类</td>
@@ -2899,19 +2900,20 @@ Huawei LiteOS系统中的软件定时器模块为用户提供下面几种功能�
 
 **开发流程**
 
+
 软件定时器的典型开发流程：
 
-1. 配置软件定时器。
-1. 确认配置项OS_INCLUDE_SWTMR和OS_INCLUDE_QUEUE为YES打开状态；
-1. 配置OS_SWTMR_MAX_SUPPORT_NUM最大支持的软件定时器数；
-1. 配置OS_SWTMR_HANDLE_QUEUE_SIZE软件定时器队列最大长度；
-1. 创建定时器LOS_SwtmrCreate。
-1. 创建一个指定计时时长、指定超时处理函数、指定触发模式的软件定时器；
-1. 返回创建成功后的软件定时器句柄；
-1. 启动定时器LOS_SwtmrStart。
-1. 获得软件定时器剩余Tick数LOS_SwtmrTimeGet。
-1. 停止定时器LOS_SwtmrStop。
-1. 删除定时器LOS_SwtmrDelete。
+- 配置软件定时器。
+- 确认配置项OS_INCLUDE_SWTMR和OS_INCLUDE_QUEUE为YES打开状态；
+- 配置OS_SWTMR_MAX_SUPPORT_NUM最大支持的软件定时器数；
+- 配置OS_SWTMR_HANDLE_QUEUE_SIZE软件定时器队列最大长度；
+- 创建定时器LOS_SwtmrCreate。
+- 创建一个指定计时时长、指定超时处理函数、指定触发模式的软件定时器；
+- 返回创建成功后的软件定时器句柄；
+- 启动定时器LOS_SwtmrStart。
+- 获得软件定时器剩余Tick数LOS_SwtmrTimeGet。
+- 停止定时器LOS_SwtmrStop。
+- 删除定时器LOS_SwtmrDelete。
 
 ##注意事项##
 
@@ -2930,27 +2932,32 @@ Huawei LiteOS系统中的软件定时器模块为用户提供下面几种功能�
 
 - 创建一次性软件定时器，该定时器超时执行完回调函数后，系统会自动删除该软件定时器，并回收资源，一次性定时器不需要手动删除。
 
+
 ##编程实例##
 
+
 **实例描述**
+
 
 使用软件定时器功能，先要创建一个基于Tick时钟源的软件定时器组，之后可基于该定时器组进行软件定时器的创建、删除、启动、暂停、重启操作。
 
 步骤如下：
 
-1. 编写回调函数，实现获取并且打印当前Tick数的功能。
-1. 创建单次和周期性软件定时器。
-1. 启动单次软件定时器。
-1. 延时200Tick数。
-1. 获取当前单次软件定时器剩余Tick数。
-1. 停止并且重启单次软件定时器。
-1. 延时1000Tick数后删除单次软件定时器。
-1. 启动周期性软件定时器。
-1. 延时1000Tick数后停止周期性软件定时器。
-1. 删除周期性软件定时器。
+- 编写回调函数，实现获取并且打印当前Tick数的功能。
+- 创建单次和周期性软件定时器。
+- 启动单次软件定时器。
+- 延时200Tick数。
+- 获取当前单次软件定时器剩余Tick数。
+- 停止并且重启单次软件定时器。
+- 延时1000Tick数后删除单次软件定时器。
+- 启动周期性软件定时器。
+- 延时1000Tick数后停止周期性软件定时器。
+- 删除周期性软件定时器。
 
 
 代码参考los_api_timer.c
+
+
 	#include <stdio.h>
 	//#include "osTest.h"
 	#include "los_swtmr.h"
@@ -3084,6 +3091,7 @@ Huawei LiteOS系统中的软件定时器模块为用户提供下面几种功能�
 **功能**
 
 Huawei LiteOS系统中的事件模块为用户提供下面几个接口。
+
 <table>
 	<tr>
     <td width = "25%"> 功能分类 </td>
@@ -3145,6 +3153,7 @@ Huawei LiteOS系统中的事件模块为用户提供下面几个接口。
 1. 测试操作是否成功。
 
 代码参考los_api_list.c
+
 	#include "los_list.h"
 	#include <stdio.h>
 	#include <stdlib.h>
