@@ -118,12 +118,12 @@
 	</tr>
 	<tr>
 	<td>Window 7 操作系</td>
-	<td>安装IAR和st-link的操作系统</td>
+	<td>安装Keil和st-link的操作系统</td>
 	</tr>
 	<tr>
 	<td>Keil(5.21以上版本)</td>
 	<td>用于编译、链接、调试程序代码
-	Vision V5.21.1.0 MDK-Lite Version:5.21a</td>
+	uVision V5.21.1.0 MDK-Lite uVersion:5.21a</td>
 	</tr>
 	<tr>
 	<td>st-link_v2_usbdriver</td>
@@ -330,6 +330,7 @@ los_dispatch.s、los_vendor.s这两个文件在Keil工程中放在projects\stm32
 ## 7编译调试
 打开工程后，菜单栏Project→Clean Targets、Build target、Rebuild All target files，可编译文件。这里点
 击Rebuild All target file，编译全部文件
+
 ![](./meta/keil/target_build.png)
 
 **关于中断向量位置选择**
@@ -392,38 +393,40 @@ sct中定义了分散加载的相关内容，LiteOS主要是在其中加入了�
 ### 移植系统中断和外部中断
 - Huawei LiteOS定义了自己的中断向量表，OS_M4_SYS_VECTOR_CNT后的其他中断处理函数都默认注册成了osHwiDefaultHandler处理函数，用户使用前需要使用LOS_HwiCreate进行注册。
 
-- 系统tick的相关中断。osTickStart()完成了tick的中断处理函数的注册。LiteOS调度相关的内容都会在每个tick中断到来时被执行。注：目前tick的配置是通过LOSCFG_BASE_CORE_TICK_PER_SECOND宏控制的，每秒1000次，即两个tick间隔是1毫秒。如果平台底层驱动有需要在tick中断中处理的事物，请在LOS_TickHandler()中增加相关内容。
+- 系统tick的相关中断。osTickStart()使能了系统时钟中断。LiteOS调度相关的内容都会在每个tick中断到来时被执行。如果平台底层驱动有需要在tick中断中处理的事物，使用LiteOS的中断机制的情况下，请在LOS_TickHandler()中增加相关内容。
 
 **说明：**
 
-在OS_M4_SYS_VECTOR_CNT之前的中断都在m_pstHwiForm[]静态地添加。
+在OS_M4_SYS_VECTOR_CNT之前的中断(系统异常和fault)都在m_pstHwiForm[]静态地添加。
 
 ### 添加LiteOS到已有的平台示例
-本章节描述的内容是以STM32F429I中的UART_TwoBoards_ComIT示例程序为基础添加LiteOS。
+本章节描述的内容是以STM32F429I中的GPIO示例程序为基础添加LiteOS。
 - 首先将LiteOS的代码添加到已有工程中如下图所示：
 ![](./meta/keil/add_files.png)
 
 - 之后我们需要配置好增加liteos后需要的头文件路径以及分散加载文件等内容。
 
 **添加头文件搜索路径**
+
 ![](./meta/keil/folder_setup.png)
 
-如上图所示的头文件路径，以及编译时需要使用C99
+编译C/C++设置中需要勾选C99选项，否则编译会报错。
 
 **添加分散加载文件**
+
 ![](./meta/keil/conf_sct.png)
 
-1. 将los_config.c文件中main函数改为mian_1,将其中的代码复制到main.c的main函数中，并注释掉其中的SystemClock_Config()。
+- 将los_config.c文件中main函数改为mian_1,将其中的代码复制到main.c的main函数中，并注释掉其中的SystemClock_Config()。
  
-2. 新建GPIO相关的任务，并实现任务处理函数LOS_Demo_Tskfunc()，将原有的main函数代移动到GPIO任务处理函数中。
+- 新建GPIO相关的任务，并实现任务处理函数LOS_Demo_Tskfunc()，将原有的main函数代移动到GPIO任务处理函数中。
  
-3. 在LOS_Demo_Tskfunc()函数中注册GPIO外部中断到LiteOS的中断向量管理表。
+- 在LOS_Demo_Tskfunc()函数中注册GPIO外部中断到LiteOS的中断向量管理表。
  
-4. los_bsp_adapter.c文件中osTickStart()函数需调用SystemClock_Config()及SysTick_Config()函数，进行系统时钟及tick配置，sys_clk_freq修改为系统时钟总频率180000000。
+- los_bsp_adapter.c文件中osTickStart()函数需调用SystemClock_Config()及SysTick_Config()函数，进行系统时钟及tick配置，sys_clk_freq修改为系统时钟总频率180000000。
  
-5. 将m_pstHwiForm表格中的LOS_TickHandler()函数修改为SysTick_Handler()函数，并在SysTick_Handler()函数中添加HAL_IncTick()函数.
+- 将m_pstHwiForm表格中的LOS_TickHandler()函数修改为SysTick_Handler()函数，并在SysTick_Handler()函数中添加HAL_IncTick()函数.
 
-6. 在mian()函数中调用GPIO任务创建函数LOS_Test_Gpio_Entry()。
+- 在main()函数中调用GPIO任务创建函数LOS_Test_Gpio_Entry()。
 
 修改后的main函数内容如下：
 	
@@ -446,7 +449,7 @@ sct中定义了分散加载的相关内容，LiteOS主要是在其中加入了�
 	  }
 	}
 
-GPIO任务创建函数：
+main.c中添加GPIO任务创建函数：
 	
 	void LOS_Test_Gpio_Entry(void)
 	{
@@ -467,7 +470,7 @@ GPIO任务创建函数：
 	    return ;
 	}
 
-GPIO任务处理函数LOS_Demo_Tskfunc()内容如下：
+main.c中添加GPIO任务处理函数LOS_Demo_Tskfunc()内容如下：
 
 	LITE_OS_SEC_TEXT VOID LOS_Demo_Tskfunc(VOID)
 	{
@@ -497,7 +500,7 @@ GPIO任务处理函数LOS_Demo_Tskfunc()内容如下：
 	  EXTILine0_Config();
 	}
 
-修改后的osTickStart()函数：
+los_bsp_adapter.c中修改后的osTickStart()函数：
 		
 	unsigned int osTickStart(void)
 	{
@@ -527,8 +530,7 @@ GPIO任务处理函数LOS_Demo_Tskfunc()内容如下：
 	    return uwRet;
 	
 	}
-
-修改后的m_pstHwiForm表格：
+los_hwi.c中修改后的m_pstHwiForm表格：
 
 	LITE_OS_SEC_VEC HWI_PROC_FUNC m_pstHwiForm[OS_M4_VECTOR_CNT] =
 	{
@@ -578,16 +580,14 @@ GPIO任务处理函数LOS_Demo_Tskfunc()内容如下：
 	  VECTOR 0x20000000 0x400 { ;vector
 		* (.vector.bss)
 	  }
-	  ARM_LIB_STACKHEAP 0x20000400 EMPTY 0x200 {
 
-	  }
-	  RW_IRAM1 0x20000600 0x0003FA00  {  ; RW data
+	  RW_IRAM1 0x20000400 0x0002Fc00  {  ; RW data
 	   .ANY (+RW +ZI)
 	   * (.data, .bss)
 	  }
 	}
 
-主要增加了VECTOR 和 ARM_LIB_STACKHEAP 以及内存中加载* (.data, .bss)这个段的内容。
+主要增加了VECTOR 及内存中加载* (.data, .bss)这个段的内容。
 
 
 ## 其他说明
