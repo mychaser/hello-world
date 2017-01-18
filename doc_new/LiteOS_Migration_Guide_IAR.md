@@ -454,7 +454,7 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 
 **代码修改**
 
-- 将los_config.c中的mian()函数改名为非main()，比如修改为main_1()
+- 将los_config.c中的main()函数改名为非main()，比如修改为main_1()
 
 ![](./meta/iar/migration_3.png)
 
@@ -583,8 +583,7 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 
 完成之后再次编译，这样就OK了。之后再调试运行就可以看到LED3和LED4会亮灭交替变化。
 
-- 注意：LOS_Start();执行就开启了时钟中断以及进程调度，LOS_Start();之后的代码都是不会
-执行。
+- 注意：LOS_Start();执行就开启了时钟中断以及进程调度，LOS_Start();之后的代码都是不会执行的。
 
 ## 其他说明
 目前git上提供的代码中直接提供了IAR和Keil的示例工程，可以直接用来进行参考。代码中关于时钟的设置都是开发板的复位后的默认时钟配置。
