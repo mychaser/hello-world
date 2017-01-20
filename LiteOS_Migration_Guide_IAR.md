@@ -411,7 +411,7 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 
 **LiteOS中断机制说明：**
 
-- LiteOS启动的时候，即platform\bsp\sample\config\los_config.c中的的osMain()用到osHwiInit()将中断OS_M4_SYS_VECTOR_CNT开始的其他中断都注册成了defaut的处理函数，用户在需要使用外部中断的话（即中断号大于OS_M4_SYS_VECTOR_CNT的中断），则需要通过调用LOS_HwiCreate()来动态的添加。
+- LiteOS启动的时候，即platform\bsp\config\los_config.c中的的osMain()用到osHwiInit()将中断OS_M4_SYS_VECTOR_CNT开始的其他中断都注册成了defaut的处理函数，用户在需要使用外部中断的话（即中断号大于OS_M4_SYS_VECTOR_CNT的中断），则需要通过调用LOS_HwiCreate()来动态的添加。
 
 - 在OS_M4_SYS_VECTOR_CNT之前的中断都在m_pstHwiForm[]静态地添加。目前最重要的Reset的的中断处理中只是调用osEnableFPU来使能浮点运算，并没有初始化一些芯片其他的配置，如果需要我们可以将某些寄存器的初始化也放到Reset中进行实现。
 
@@ -433,12 +433,13 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 
 ### 添加LiteOS到已有的平台示例
 
-本章节描述的内容是以stm32f429zi中的gpio中断示例程序为基础添加LiteOS。
+本章节描述的内容是以stm32f429zi中的LED灯亮灭示例程序为基础添加LiteOS。工程位置STM32Cube_FW_F4_V1.14.0\Projects\STM32F429I-Discovery\Examples\BSP\EWARM
+
 - 首先将LiteOS的代码添加到已有工程中如下图所示：
 
 ![](./meta/iar/migration_0.png)
 
-说明：示例中直接使用了原始工程中的汇编启动文件，所以就不需要添加los_vendor.s文件。如果使用系统原始的汇编文件，则LiteOS中的los_vendor.s不要添加，
+说明：示例中直接使用了原始工程中的汇编启动文件，所以就不需要添加los_vendor.s文件。
 
 - 目前示例中我们不使用LiteOS的中断处理机制，所以不配置LiteOS的分散加载文件。
 
@@ -467,7 +468,14 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 
 ![](./meta/iar/migration_5.png)
 
+修改los_bsp_adapter.c，添加头文件包含
+
+	头文件包含
+	#include "stm32f4xx.h"
+	#include "core_cm4.h"
+
 修改los_bsp_adapter.c中osTickStart()的实现，调用SystemClock_Config()
+
 
 	unsigned int osTickStart(void)
 	{
@@ -490,6 +498,7 @@ LiteOS中提供的所有接口的使用示例都可以在“HuaweiLiteOSKernelDe
 	    *(volatile UINT32 *)OS_SYSTICK_CONTROL_REG = (1 << 2) | (1 << 1) | (1 << 0);
 	#else
 	    SystemClock_Config();
+		SysTick_Config(g_ucycle_per_tick);
 	#endif    
 	    return uwRet;
 	
