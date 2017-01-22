@@ -304,9 +304,11 @@ LiteOS中提供的功能包括如下内容： 任务创建与删除、任务同�
 - 使用Keil 5创建空工程。
 
 下图显示的是创建之后的芯片型号等内容
+
 ![](./meta/keil/gd32f190/create_prj.png)
 
 - 添加LED测试代码到工程目录，下面是添加完成后的内容
+
 ![](./meta/keil/gd32f190/add_code1.png)
 ![](./meta/keil/gd32f190/add_code2.png)
 
@@ -321,6 +323,7 @@ LiteOS中提供的功能包括如下内容： 任务创建与删除、任务同�
 - 编译C/C++设置中需要勾选C99选项，否则编译会报错。
 
 添加宏定义 USE_STDPERIPH_DRIVER,GD32F170_190,RAM_SIZE_LEVEL_0,GD32F190R8
+
 ![](./meta/keil/gd32f190/add_code5.png)
 
 勾选C99选项
@@ -410,8 +413,14 @@ Heap_Size EQU 0x00000400 修改为 Heap_Size EQU 0x00000200
 
 ![](./meta/keil/gd32f190/add_code9.png)
 
+- 在main.c中实现如下功能，
 
-- 修改main.c, 详细内容如下
+创建2个task，用于点亮LED1和LED2，并且用互斥锁来决定哪个task可以执行亮灯的操作。
+
+创建一个中断(Tamper按键)，在中断中点亮熄灭 LED3和LED4.
+
+
+修改main.c, 详细内容如下
 
 	#include "gd32f1x0.h"
 	#include "systick.h"
@@ -551,6 +560,9 @@ Heap_Size EQU 0x00000400 修改为 Heap_Size EQU 0x00000200
 	    for (;;);
 	    /* Replace the dots (...) with your own code.  */
 	}
+
+
+
 
 
 ## 其他说明
